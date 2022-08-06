@@ -4,8 +4,10 @@
 
 - View Binding
 
-- Shared Preferences
+- Permission
 
 - SQLite
+
+- Shared Preferences
 
 - İntent
