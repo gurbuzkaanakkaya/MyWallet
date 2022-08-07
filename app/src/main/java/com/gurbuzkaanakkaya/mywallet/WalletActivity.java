@@ -80,32 +80,47 @@ public class WalletActivity extends AppCompatActivity {
         }
     }
     public void delete(View view){
-        Intent intent = getIntent();
-        int walletId = intent.getIntExtra("walletId",0);
-        try {
-            sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS wallet (id INTEGER PRIMARY KEY, payname VARCHAR, pay VARCHAR, year VARCHAR, image BLOB)");
-            Cursor cursor = sqLiteDatabase.rawQuery("DELETE FROM wallet WHERE id = ?",new String[]{String.valueOf(walletId)});
-            int nameIx = cursor.getColumnIndex("payname");
-            int payIx = cursor.getColumnIndex("pay");
-            int yearIx = cursor.getColumnIndex("year");
-            int imageIx = cursor.getColumnIndex("image");
-            while (cursor.moveToNext()){
-                binding.nameText.setText(cursor.getString(nameIx));
-                binding.payText.setText(cursor.getString(payIx));
-                binding.yearText.setText(cursor.getString(yearIx));
-                byte[] bytes = cursor.getBlob(imageIx);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                binding.imageView.setImageBitmap(bitmap);
-            }cursor.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        int losepayment = 0;
-        losepayment = Integer.parseInt(binding.payText.getText().toString());
-        Intent loseintent = new Intent(WalletActivity.this,MainActivity.class);
-        loseintent.putExtra("losepayment",losepayment);
-        loseintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(loseintent);
+        AlertDialog.Builder alert = new AlertDialog.Builder(WalletActivity.this);
+        alert.setTitle("Kaydı Sil!");
+        alert.setMessage("Bu kaydı silmek istiyor musunuz?");
+        alert.setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = getIntent();
+                int walletId = intent.getIntExtra("walletId",0);
+                try {
+                    sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS wallet (id INTEGER PRIMARY KEY, payname VARCHAR, pay VARCHAR, year VARCHAR, image BLOB)");
+                    Cursor cursor = sqLiteDatabase.rawQuery("DELETE FROM wallet WHERE id = ?",new String[]{String.valueOf(walletId)});
+                    int nameIx = cursor.getColumnIndex("payname");
+                    int payIx = cursor.getColumnIndex("pay");
+                    int yearIx = cursor.getColumnIndex("year");
+                    int imageIx = cursor.getColumnIndex("image");
+                    while (cursor.moveToNext()){
+                        binding.nameText.setText(cursor.getString(nameIx));
+                        binding.payText.setText(cursor.getString(payIx));
+                        binding.yearText.setText(cursor.getString(yearIx));
+                        byte[] bytes = cursor.getBlob(imageIx);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                        binding.imageView.setImageBitmap(bitmap);
+                    }cursor.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                int losepayment = 0;
+                losepayment = Integer.parseInt(binding.payText.getText().toString());
+                Intent loseintent = new Intent(WalletActivity.this,MainActivity.class);
+                loseintent.putExtra("losepayment",losepayment);
+                loseintent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(loseintent);
+            }
+        });
+        alert.setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(WalletActivity.this,"Kaydınız Silinemedi!",Toast.LENGTH_SHORT).show();
+            }
+        });
+        alert.show();
 
     }
     public void save(View view){
